@@ -27,8 +27,8 @@ export async function POST(request: any) {
     //     userId,
     //   },
     // },
-    success_url: "http://localhost:3000",
-    cancel_url: "http://localhost:3000",
+    success_url: process.env.NEXT_PUBLIC_APP_URL,
+    cancel_url: process.env.NEXT_PUBLIC_APP_URL,
   });
 
   // console.log("====================================");
