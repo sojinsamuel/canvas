@@ -1,6 +1,7 @@
 import Stripe from "stripe";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
+import { db } from "@/db";
 
 export async function POST(req: Request) {
   const body = await req.text();
@@ -25,15 +26,33 @@ export async function POST(req: Request) {
   console.log("====================================");
   console.log(JSON.stringify(session, null, 2));
   console.log("====================================");
-
+  const subscription = await stripe.subscriptions.retrieve(
+    session.subscription as string
+  );
+  if (event.type === "charge.succeeded") {
+    console.log("====================================");
+    console.log("Charge succeeded");
+    console.log("====================================");
+  }
   if (event.type === "checkout.session.completed") {
     const subscription = await stripe.subscriptions.retrieve(
       session.subscription as string
     );
 
     console.log("====================================");
-    console.log("User id", session?.metadata?.userId);
+    console.log("User id", session);
     console.log("====================================");
+
+    await db.user.update({
+      where: {
+        id: session.client_reference_id as string,
+      },
+      data: {
+        credits: {
+          increment: 5,
+        },
+      },
+    });
   }
 
   if (event.type === "payment_intent.payment_failed") {
@@ -45,7 +64,7 @@ export async function POST(req: Request) {
   if (event.type === "payment_intent.succeeded") {
     console.log("====================================");
     console.log("Payment succeeded");
-    console.log("User id", session?.metadata?.userId);
+    console.log("User id", session?.client_reference_id);
 
     console.log("====================================");
   }

@@ -1,7 +1,14 @@
 import Stripe from "stripe";
 import { NextResponse } from "next/server";
+import { auth, currentUser } from "@clerk/nextjs";
 
 export async function POST(request: any) {
+  const { userId } = auth();
+  const user = await currentUser();
+
+  if (!userId) {
+    return new NextResponse("userId not found", { status: 401 });
+  }
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
   let data = await request.json();
   let priceId = data.priceId;
@@ -12,11 +19,14 @@ export async function POST(request: any) {
         quantity: 1,
       },
     ],
-    payment_method_types: ["card"],
     mode: "payment",
-    metadata: {
-      userId: "1232342352",
-    },
+    customer_email: user?.emailAddresses[0].emailAddress,
+    client_reference_id: userId,
+    // subscription_data: {
+    //   metadata: {
+    //     userId,
+    //   },
+    // },
     success_url: "http://localhost:3000",
     cancel_url: "http://localhost:3000",
   });

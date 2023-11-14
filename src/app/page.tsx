@@ -2,35 +2,24 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Card from "../components/cards/card";
-
-const pricing = [
-  {
-    plan: "silver",
-    price: 49,
-  },
-  {
-    plan: "gold",
-    price: 99,
-  },
-  {
-    plan: "platinum",
-    price: 199,
-  },
-];
+import { useUser } from "@clerk/nextjs";
 
 export default function Home() {
   const [prices, setPrices] = useState([]);
+  const { isLoaded, user } = useUser();
   const fetchPrices = async () => {
     const { data } = await axios.get("/api/getproducts");
-    console.log("====================================");
-    console.log(data.slice(4));
+    // console.log("====================================");
+    // console.log(data.slice(4));
     setPrices(data.slice(4));
-    console.log("====================================");
+    // console.log("====================================");
   };
 
   useEffect(() => {
     fetchPrices();
   }, []);
+  if (isLoaded)
+    console.log(user?.fullName, user?.emailAddresses[0].emailAddress, user?.id);
 
   return (
     <section>
