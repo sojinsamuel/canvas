@@ -27,8 +27,8 @@ export async function POST(request: any) {
     //     userId,
     //   },
     // },
-    success_url: process.env.NEXT_PUBLIC_APP_URL,
-    cancel_url: process.env.NEXT_PUBLIC_APP_URL,
+    success_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing`,
+    cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing`,
   });
 
   // console.log("====================================");
